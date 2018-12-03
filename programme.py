@@ -33,7 +33,7 @@ def affichagePointsCles(im, listeAvecOrientation) :
     plt.show()
     
 #Affichage du matching de deux images à partir de la liste des descripteurs
-def matching(img, imd, KFgauche, KFdroite, n) :
+def matching(img, imd, KFgauche, KFdroite, n, r) :
     print('...Affichage des résultats')
     fig,(axg,axd) = plt.subplots(1,2)    
     axg.imshow(img, cmap='gray')
@@ -44,9 +44,9 @@ def matching(img, imd, KFgauche, KFdroite, n) :
         gauche = i[0]
         droite = i[1]        
         color = '#{}'.format("%06x" % random.randint(0, 0xFFFFFF))    
-        circg = patches.Wedge((int(KFgauche[gauche,1]),int(KFgauche[gauche,0])),10, 0, 360, width=1, color=color)
+        circg = patches.Wedge((int(KFgauche[gauche,1]),int(KFgauche[gauche,0])),r, 0, 360, width=1, color=color)
         axg.add_patch(circg)
-        circd = patches.Wedge((int(KFdroite[droite,1]),int(KFdroite[droite,0])),10, 0, 360, width=1, color=color)
+        circd = patches.Wedge((int(KFdroite[droite,1]),int(KFdroite[droite,0])),r, 0, 360, width=1, color=color)
         axd.add_patch(circd)        
     plt.title('Matching des points clés')
     plt.show()
@@ -76,7 +76,8 @@ def trouverPointsCles(nomImage, Nspo, Noct) :
     #Nspo = nombre d'échelles par octave
     #Noct = nombre d'octaves
     #n = nombre de points pour effectuer le matching
-def trouverDescripteurs(nomImageGauche, nomImageDroite, Nspo, Noct, n=10):
+    #r: valeur modifiant au rayon affiché sur l'image, 10 convient pour des images petites, 30 pour des dimensions égales à 1000
+def trouverDescripteurs(nomImageGauche, nomImageDroite, Nspo, Noct, n=10, r=30):
     ### GAUCHE
     
     print('### Image '+nomImageGauche)
@@ -96,7 +97,6 @@ def trouverDescripteurs(nomImageGauche, nomImageDroite, Nspo, Noct, n=10):
     np.save('matGauche.npy', matrice_pointscles)
     print('...Calcul des descripteurs')
     KPgauche = fc.keypoint_descriptor(listeAvecOrientation, grad_ligne, grad_col)
-    print('...Affichage des résultats')
 
     ### DROITE
 
@@ -117,10 +117,10 @@ def trouverDescripteurs(nomImageGauche, nomImageDroite, Nspo, Noct, n=10):
     np.save('matDroite.npy', matrice_pointscles)
     print('...Calcul des descripteurs')
     KPdroite = fc.keypoint_descriptor(listeAvecOrientation, grad_ligne, grad_col)
-    print('...Affichage des résultats')
 
     ### MATCHING
-    matching(img, imd, KPgauche, KPdroite, n)
+    print('...Affichage des résultats')
+    matching(img, imd, KPgauche, KPdroite, n, r)
  
     
     
@@ -136,6 +136,8 @@ def trouverDescripteurs(nomImageGauche, nomImageDroite, Nspo, Noct, n=10):
 #trouverPointsCles('Lenna_SmallRotation.jpg', 3, 4)
     
 
-# But : Observer Le Matching entre Lenna Gauche et Lenna Droite
-trouverDescripteurs('LennaGauche.jpg', 'LennaDroite.jpg', 3, 4)
+## But : Observer Le Matching entre les images Lenna Gauche et Lenna Droite
+#trouverDescripteurs('LennaGauche.jpg', 'LennaDroite.jpg', 3, 4)
 
+## But : Observer Le Matching entre les deux images de Mars (très long en temps de calcul des descripteurs)
+#trouverDescripteurs('gauche.jpg', 'droite.jpg', 3, 4)
